@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 
 @Slf4j
 @RestController
@@ -28,29 +29,46 @@ public class EmployeeController {
         password = DigestUtils.md5DigestAsHex(password.getBytes());
 
         LambdaQueryWrapper<Employee> employeeLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        employeeLambdaQueryWrapper.eq(Employee::getUsername,employee.getUsername());
+        employeeLambdaQueryWrapper.eq(Employee::getUsername, employee.getUsername());
         Employee emp = employeeService.getOne(employeeLambdaQueryWrapper);
 
-        if (emp==null) {
+        if (emp == null) {
             return R.error("登录失败");
         }
 
-        if (!password.equals(emp.getPassword())){
+        if (!password.equals(emp.getPassword())) {
             return R.error("登录失败");
         }
 
-        if (emp.getStatus()==0){
+        if (emp.getStatus() == 0) {
             return R.error("账号已禁用");
         }
 
-        httpServletRequest.getSession().setAttribute("employee",emp.getId());
+        httpServletRequest.getSession().setAttribute("employee", emp.getId());
 
         return R.success(emp);
     }
 
     @PostMapping("/logout")
-    public R<String> logout(HttpServletRequest httpServletRequest){
+    public R<String> logout(HttpServletRequest httpServletRequest) {
         httpServletRequest.removeAttribute("employee");
         return R.success("退出成功");
+    }
+
+    @PostMapping
+    public R<String> save(HttpServletRequest httpServletRequest, @RequestBody Employee employee) {
+
+        employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
+
+        employee.setCreateTime(LocalDateTime.now());
+        employee.setUpdateTime(LocalDateTime.now());
+
+        Long userId = (Long) httpServletRequest.getSession().getAttribute("employee");
+        employee.setCreateUser(userId);
+        employee.setUpdateUser(userId);
+
+        employeeService.save(employee);
+
+        return R.success("新增员工成功");
     }
 }
