@@ -1,6 +1,7 @@
 package com.huwenkang.reggie.filter;
 
 import com.alibaba.fastjson.JSON;
+import com.huwenkang.reggie.common.BaseContext;
 import com.huwenkang.reggie.common.R;
 import org.springframework.util.AntPathMatcher;
 
@@ -29,13 +30,17 @@ public class LoginCheckFilter implements Filter {
         };
         boolean check = check(urls, requestURI);
 
-        if (check){
-            filterChain.doFilter(request,response);
+        if (check) {
+            filterChain.doFilter(request, response);
             return;
         }
 
-        if (request.getSession().getAttribute("employee")!=null){
-            filterChain.doFilter(request,response);
+        if (request.getSession().getAttribute("employee") != null) {
+
+            Long empId = (Long) request.getSession().getAttribute("employee");
+            BaseContext.setCurrentId(empId);
+
+            filterChain.doFilter(request, response);
             return;
         }
 
