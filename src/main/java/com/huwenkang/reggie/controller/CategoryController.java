@@ -8,6 +8,8 @@ import com.huwenkang.reggie.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/category")
 public class CategoryController {
@@ -40,4 +42,18 @@ public class CategoryController {
         categoryService.updateById(category);
         return R.success("修改成功");
     }
+
+    @GetMapping("/list")
+    public R<List<Category>> list(Category category) {
+        LambdaQueryWrapper<Category> categoryLambdaQueryWrapper = new LambdaQueryWrapper<>();
+
+        categoryLambdaQueryWrapper.eq(category != null, Category::getType, category.getType());
+        categoryLambdaQueryWrapper.orderByAsc(Category::getSort);
+
+        List<Category> list = categoryService.list(categoryLambdaQueryWrapper);
+
+        return R.success(list);
+
+    }
+
 }
