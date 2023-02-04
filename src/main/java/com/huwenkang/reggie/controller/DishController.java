@@ -75,7 +75,7 @@ public class DishController {
     }
 
     @GetMapping("{id}")
-    public R<DishDto> get(@PathVariable Long id){
+    public R<DishDto> get(@PathVariable Long id) {
         DishDto byIdWithFlavor = dishService.getByIdWithFlavor(id);
 
         return R.success(byIdWithFlavor);
@@ -86,5 +86,18 @@ public class DishController {
         dishService.updateWithFlavor(dishDto);
 
         return R.success("修改菜品成功");
+    }
+
+    @GetMapping("/list")
+    public R<List<Dish>> list(Dish dish) {
+        LambdaQueryWrapper<Dish> dishLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        dishLambdaQueryWrapper.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
+        dishLambdaQueryWrapper.eq(Dish::getStatus, 1);
+
+        dishLambdaQueryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
+
+        List<Dish> list = dishService.list(dishLambdaQueryWrapper);
+
+        return R.success(list);
     }
 }
