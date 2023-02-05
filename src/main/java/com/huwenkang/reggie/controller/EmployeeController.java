@@ -73,7 +73,7 @@ public class EmployeeController {
 
     @GetMapping("/page")
     public R<Page<Employee>> page(int page, int pageSize, String name) {
-        Page<Employee> pageInfo = new Page<>();
+        Page<Employee> pageInfo = new Page<>(page, pageSize);
 
         LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.like(StringUtils.isNotEmpty(name), Employee::getName, name);
@@ -96,11 +96,11 @@ public class EmployeeController {
     }
 
     @GetMapping("/{id}")
-    public R<Employee> getById(@PathVariable Long id){
+    public R<Employee> getById(@PathVariable Long id) {
         Employee employee = employeeService.getById(id);
-        if (employee!=null){
+        if (employee != null) {
             return R.success(employee);
-        }else {
+        } else {
             return R.error("没有查到对应员工的信息");
         }
     }
