@@ -8,6 +8,7 @@ import com.huwenkang.reggie.service.ShoppingCartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -37,6 +38,7 @@ public class ShoppingCartController {
             shoppingCartService.updateById(cart);
         } else {
             shoppingCart.setNumber(1);
+            shoppingCart.setCreateTime(LocalDateTime.now());
             shoppingCartService.save(shoppingCart);
             cart = shoppingCart;
         }
@@ -49,6 +51,7 @@ public class ShoppingCartController {
 
         LambdaQueryWrapper<ShoppingCart> shoppingCartLambdaQueryWrapper = new LambdaQueryWrapper<>();
         shoppingCartLambdaQueryWrapper.eq(ShoppingCart::getUserId, BaseContext.getCurrentId());
+        shoppingCartLambdaQueryWrapper.orderByAsc(ShoppingCart::getCreateTime);
 
         List<ShoppingCart> list = shoppingCartService.list(shoppingCartLambdaQueryWrapper);
 
